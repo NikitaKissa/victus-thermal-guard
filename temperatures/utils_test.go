@@ -54,3 +54,38 @@ func TestByteToInt(t *testing.T) {
 		})
 	}
 }
+
+func TestMillidegToDeg(t *testing.T) {
+	tests := []struct {
+		name    string
+		input   int
+		want    float64
+		wantErr bool
+	}{
+		{
+			name:  "positive temperature",
+			input: 51875,
+			want:  51.875,
+		},
+		{
+			name:  "negative temperature",
+			input: -51875,
+			want:  -51.875,
+		},
+		{
+			name:  "zero value",
+			input: 0,
+			want:  0,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got := millidegToDeg(tt.input)
+
+			if got != tt.want {
+				t.Errorf("millidegToDeg() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
