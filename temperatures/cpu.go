@@ -1,6 +1,16 @@
 package temperatures
 
-func GetCPUTemperature() int {
+import "fmt"
+
+func GetCPUTemperature() (int, error) {
 	filepath := telemetryPaths.CPU
-	return getTemperature(filepath)
+	telemetry, err := getTemperature(filepath)
+	if err != nil {
+		return 0, fmt.Errorf(
+			"get cpu temperature: %w",
+			err,
+		)
+	}
+
+	return telemetry, nil
 }

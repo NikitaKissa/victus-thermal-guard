@@ -1,37 +1,46 @@
 package temperatures
 
 import (
+	"fmt"
 	"os"
 	"strconv"
 	"strings"
 )
 
-const (
-	NaN         = -1
-	ErrReadFile = -2
-)
-
-func bytesToInt(asciiTemp []byte) int {
+func bytesToInt(asciiTemp []byte) (int, error) {
 	str := string(asciiTemp)
 	str = strings.TrimSuffix(str, "\n")
+
 	integer, err := strconv.Atoi(str)
 	if err != nil {
-		integer = NaN
+		return 0, fmt.Errorf(
+			"failed translation of []byte{%v} to int: %w \nstringrepresentation of that data {%s}",
+			asciiTemp,
+			err,
+			str,
+		)
 	}
 
-	return integer
+	return integer, nil
 }
 
 func millidegToDeg(i int) int {
 	return i / 1000
 }
 
-func getTemperature(filepath string) int {
+func getTemperature(filepath string) (int, error) {
 	data, err := os.ReadFile(filepath)
 	if err != nil {
-		return ErrReadFile
+		return 0, fmt.Errorf(
+			"failed to read temperature: %w",
+			err,
+		)
 	}
 
-	millidegrees := bytesToInt(data)
-	return millidegToDeg(millidegrees)
+	millidegrees, err := bytesToInt(data)
+	if err != nil {
+
+	}
+
+	return millidegToDeg(millidegrees), err
 }

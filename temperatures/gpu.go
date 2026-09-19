@@ -1,6 +1,16 @@
 package temperatures
 
-func GetGPUTemperature() int {
+import "fmt"
+
+func GetGPUTemperature() (int, error) {
 	filepath := telemetryPaths.GPU
-	return getTemperature(filepath)
+	telemetry, err := getTemperature(filepath)
+	if err != nil {
+		return 0, fmt.Errorf(
+			"get gpu temperature: %w",
+			err,
+		)
+	}
+
+	return telemetry, nil
 }
