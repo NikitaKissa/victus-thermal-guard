@@ -24,11 +24,11 @@ func bytesToInt(asciiTemp []byte) (int, error) {
 	return integer, nil
 }
 
-func millidegToDeg(i int) int {
-	return i / 1000
+func millidegToDeg(i int) float64 {
+	return float64(i) / 1000
 }
 
-func getTemperature(filepath string) (int, error) {
+func getTemperature(filepath string) (float64, error) {
 	data, err := os.ReadFile(filepath)
 	if err != nil {
 		return 0, fmt.Errorf(

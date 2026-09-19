@@ -2,7 +2,7 @@ package temperatures
 
 import "fmt"
 
-func GetGPUTemperature() (int, error) {
+func GetGPUTemperature() (float64, error) {
 	filepath := telemetryPaths.GPU
 	telemetry, err := getTemperature(filepath)
 	if err != nil {

@@ -2,7 +2,7 @@ package temperatures
 
 import "fmt"
 
-func GetCPUTemperature() (int, error) {
+func GetCPUTemperature() (float64, error) {
 	filepath := telemetryPaths.CPU
 	telemetry, err := getTemperature(filepath)
 	if err != nil {

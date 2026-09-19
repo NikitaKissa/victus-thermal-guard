@@ -4,47 +4,63 @@ import (
 	"context"
 	"fmt"
 	"log"
+	"os"
+	"os/signal"
+	"syscall"
 	"time"
 
-	"github.com/NikitaKissa/victus-thermal-guard.git/temperatures"
-	"golang.org/x/sync/errgroup"
+	"github.com/NikitaKissa/victus-thermal-guard/temperatures"
 )
 
 func main() {
-	ctx := context.Background()
 	log.SetFlags(0)
 
+	if err := run(); err != nil {
+		log.Print(err)
+		os.Exit(1)
+	}
+}
+
+func run() error {
+	ctx, stop := signal.NotifyContext(
+		context.Background(),
+		syscall.SIGINT,
+		syscall.SIGTERM,
+	)
+	defer stop()
+
 	if err := temperatures.FindTelemetry(); err != nil {
-		err = fmt.Errorf("error during searching for telemetry: %w", err)
-		panic(err)
+		return fmt.Errorf("find telemetry: %w", err)
 	}
 
 	ticker := time.NewTicker(250 * time.Millisecond)
+	defer ticker.Stop()
 
-	for range ticker.C {
-		cpu, gpu, err := asyncGetTemperatures(ctx)
+	for {
+		select {
+		case <-ctx.Done():
+			return nil
+		case <-ticker.C:
+		}
+
+		cpu, gpu, err := getTemperatures()
 		if err != nil {
-			log.Fatal(err)
+			log.Print(err)
+			continue
 		}
 
 		log.Printf("CPU: %v;  GPU: %v", cpu, gpu)
 	}
 }
 
-func asyncGetTemperatures(ctx context.Context) (cpu int, gpu int, err error) {
-	g, ctx := errgroup.WithContext(ctx)
+func getTemperatures() (cpu float64, gpu float64, err error) {
+	gpu, err = temperatures.GetGPUTemperature()
+	if err != nil {
+		return 0, 0, err
+	}
 
-	g.Go(func() error {
-		cpu, err = temperatures.GetCPUTemperature()
-		return err
-	})
-
-	g.Go(func() error {
-		gpu, err = temperatures.GetGPUTemperature()
-		return err
-	})
-
-	if err := g.Wait(); err != nil {
+	cpu, err = temperatures.GetCPUTemperature()
+	if err != nil {
 		return 0, 0, err
 	}
 

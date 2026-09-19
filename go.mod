@@ -1,5 +1,3 @@
-module github.com/NikitaKissa/victus-thermal-guard.git
+module github.com/NikitaKissa/victus-thermal-guard
 
 go 1.27.0
-
-require golang.org/x/sync v0.23.0 // indirect
