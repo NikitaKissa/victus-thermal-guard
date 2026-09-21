@@ -63,14 +63,12 @@ func run() error {
 
 		if maxT > 76 {
 			if err := controller.SetFansMax(); err != nil {
-				err = fmt.Errorf("unable to set fans `max`: %w", err)
 				log.Print(err)
 			}
 		}
 
 		if maxT < 70 {
 			if err := controller.SetFansAuto(); err != nil {
-				err = fmt.Errorf("unable to set fans `auto`: %w", err)
 				log.Print(err)
 			}
 		}
