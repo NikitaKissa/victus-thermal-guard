@@ -1,41 +1,51 @@
 package victus
 
+import "context"
+
 type Controller interface {
-	SetFansMax() error
-	SetFansAuto() error
+	SetFansMax(ctx context.Context) error
+	SetFansAuto(ctx context.Context) error
 }
 
 type controller struct {
-	backend Backend
+	backend   Backend
+	isFansMax bool
 }
 
 type Backend interface {
-	SetFansMax() error
-	SetFansAuto() error
+	SetFansMax(ctx context.Context) error
+	SetFansAuto(ctx context.Context) error
 }
 
 func NewController(backend Backend) Controller {
 	return &controller{
-		backend: backend,
+		backend:   backend,
+		isFansMax: false,
 	}
 }
 
-var isFansMax = false
-
-func (c *controller) SetFansMax() error {
-	if isFansMax {
+func (c *controller) SetFansMax(ctx context.Context) error {
+	if c.isFansMax {
 		return nil
 	}
 
-	isFansMax = true
-	return c.backend.SetFansMax()
+	err := c.backend.SetFansMax(ctx)
+	if err == nil {
+		c.isFansMax = true
+	}
+
+	return err
 }
 
-func (c *controller) SetFansAuto() error {
-	if !isFansMax {
+func (c *controller) SetFansAuto(ctx context.Context) error {
+	if !c.isFansMax {
 		return nil
 	}
 
-	isFansMax = false
-	return c.backend.SetFansAuto()
+	err := c.backend.SetFansAuto(ctx)
+	if err == nil {
+		c.isFansMax = false
+	}
+
+	return err
 }

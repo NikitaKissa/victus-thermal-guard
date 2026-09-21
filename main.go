@@ -24,6 +24,17 @@ func main() {
 	}
 }
 
+const shutdownTimeout = 3 * time.Second
+
+func restoreFans(controller victus.Controller) {
+	ctx, cancel := context.WithTimeout(context.Background(), shutdownTimeout)
+	defer cancel()
+
+	if err := controller.SetFansAuto(ctx); err != nil {
+		log.Printf("restore fans to auto: %v", err)
+	}
+}
+
 func run() error {
 	ctx, stop := signal.NotifyContext(
 		context.Background(),
@@ -38,8 +49,9 @@ func run() error {
 
 	backend, err := victusdbus.New()
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
+	defer backend.Close()
 
 	controller := victus.NewController(backend)
 
@@ -49,6 +61,7 @@ func run() error {
 	for {
 		select {
 		case <-ctx.Done():
+			restoreFans(controller)
 			return nil
 		case <-ticker.C:
 		}
@@ -61,18 +74,26 @@ func run() error {
 
 		maxT := math.Max(cpu, gpu)
 
-		if maxT > 76 {
-			if err := controller.SetFansMax(); err != nil {
-				log.Print(err)
-			}
-		}
-
-		if maxT < 70 {
-			if err := controller.SetFansAuto(); err != nil {
-				log.Print(err)
-			}
+		if err := setFans(ctx, controller, maxT); err != nil {
+			log.Print(err)
 		}
 	}
+}
+
+func setFans(
+	ctx context.Context,
+	controller victus.Controller,
+	temperature float64,
+) error {
+	if temperature >= 77 {
+		return controller.SetFansMax(ctx)
+	}
+
+	if temperature < 68 {
+		return controller.SetFansAuto(ctx)
+	}
+
+	return nil
 }
 
 func getTemperatures() (cpu float64, gpu float64, err error) {
