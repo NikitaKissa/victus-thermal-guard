@@ -4,12 +4,15 @@ import (
 	"context"
 	"fmt"
 	"log"
+	"math"
 	"os"
 	"os/signal"
 	"syscall"
 	"time"
 
 	"github.com/NikitaKissa/victus-thermal-guard/temperatures"
+	"github.com/NikitaKissa/victus-thermal-guard/victus"
+	victusdbus "github.com/NikitaKissa/victus-thermal-guard/victus/dbus"
 )
 
 func main() {
@@ -33,6 +36,13 @@ func run() error {
 		return fmt.Errorf("find telemetry: %w", err)
 	}
 
+	backend, err := victusdbus.New()
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	controller := victus.NewController(backend)
+
 	ticker := time.NewTicker(250 * time.Millisecond)
 	defer ticker.Stop()
 
@@ -49,7 +59,21 @@ func run() error {
 			continue
 		}
 
-		log.Printf("CPU: %v;  GPU: %v", cpu, gpu)
+		maxT := math.Max(cpu, gpu)
+
+		if maxT > 76 {
+			if err := controller.SetFansMax(); err != nil {
+				err = fmt.Errorf("unable to set fans `max`: %w", err)
+				log.Print(err)
+			}
+		}
+
+		if maxT < 70 {
+			if err := controller.SetFansAuto(); err != nil {
+				err = fmt.Errorf("unable to set fans `auto`: %w", err)
+				log.Print(err)
+			}
+		}
 	}
 }
 
