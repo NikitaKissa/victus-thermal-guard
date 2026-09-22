@@ -89,3 +89,71 @@ MeasurementInterval=250 # in milliseconds`
 		}
 	}
 }
+
+func TestParseRow(t *testing.T) {
+	tests := []struct {
+		name    string
+		input   string
+		wantKey string
+		wantVal string
+		wantErr bool
+	}{
+		{
+			name:    "upper case",
+			input:   "TEMPERATURE=79",
+			wantKey: "TEMPERATURE",
+			wantVal: "79",
+		},
+		{
+			name:    "lower case",
+			input:   "temperature=79",
+			wantKey: "temperature",
+			wantVal: "79",
+		},
+		{
+			name:    "perfect valid data",
+			input:   "ActivateTemperature=79",
+			wantKey: "ActivateTemperature",
+			wantVal: "79",
+		},
+		{
+			name:    "without param",
+			input:   "ActivateTemperature=",
+			wantKey: "ActivateTemperature",
+			wantVal: "",
+		},
+		{
+			name:    "invalid more than 1 equal",
+			input:   "ActivateTemperature=79=67",
+			wantErr: true,
+		},
+		{
+			name:    "invalid more than 1 equal (second case)",
+			input:   "ActivateTemperature==79",
+			wantErr: true,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			gotKey, gotVal, err := parseRow(tt.input)
+
+			if (err != nil) != tt.wantErr {
+				t.Fatalf("parseRow() error = %v, wantErr %v", err, tt.wantErr)
+			}
+
+			if err != nil {
+				return
+			}
+
+			if gotKey != tt.wantKey && gotVal != tt.wantVal {
+				t.Errorf("cleanRow() = (%v, %v), want (%v, %v)",
+					gotKey,
+					gotVal,
+					tt.wantKey,
+					tt.wantVal,
+				)
+			}
+		})
+	}
+}

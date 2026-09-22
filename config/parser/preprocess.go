@@ -1,6 +1,7 @@
 package configparser
 
 import (
+	"fmt"
 	"strings"
 	"unicode"
 )
@@ -38,4 +39,25 @@ func splitAndCleanRows(s string) []string {
 	}
 
 	return output
+}
+
+func parseRow(row string) (key string, value string, err error) {
+	elements := strings.Split(row, "=")
+	if len(elements) > 2 {
+		return "", "", fmt.Errorf(
+			"row `%s` has more then 1 `=`, can't parse it to key=value structure: %w",
+			row,
+			ErrSyntax,
+		)
+	}
+
+	if len(elements) < 2 {
+		return "", "", fmt.Errorf(
+			"row `%s` doesn't match key=value structure: %w",
+			row,
+			ErrSyntax,
+		)
+	}
+
+	return elements[0], elements[1], nil
 }
