@@ -7,6 +7,7 @@ import (
 	"math"
 	"os"
 	"os/signal"
+	"runtime"
 	"syscall"
 	"time"
 
@@ -16,6 +17,8 @@ import (
 )
 
 func main() {
+	runtime.GOMAXPROCS(2)
+
 	log.SetFlags(0)
 
 	if err := run(); err != nil {
