@@ -11,6 +11,7 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/NikitaKissa/victus-thermal-guard/config"
 	"github.com/NikitaKissa/victus-thermal-guard/temperatures"
 	"github.com/NikitaKissa/victus-thermal-guard/victus"
 	victusdbus "github.com/NikitaKissa/victus-thermal-guard/victus/dbus"
@@ -38,6 +39,11 @@ func restoreFans(controller victus.Controller) {
 	}
 }
 
+var (
+	activateTemperature   float64
+	deactivateTemperature float64
+)
+
 func run() error {
 	ctx, stop := signal.NotifyContext(
 		context.Background(),
@@ -45,6 +51,14 @@ func run() error {
 		syscall.SIGTERM,
 	)
 	defer stop()
+
+	config, err := config.NewConfig("./deploy/default-config.cfg")
+	if err != nil {
+		log.Print(err)
+	}
+
+	activateTemperature = config.ActivateTemperature
+	deactivateTemperature = config.ActivateTemperature - config.Hysteresis
 
 	if err := temperatures.FindTelemetry(); err != nil {
 		return fmt.Errorf("find telemetry: %w", err)
@@ -58,7 +72,8 @@ func run() error {
 
 	controller := victus.NewController(backend)
 
-	ticker := time.NewTicker(250 * time.Millisecond)
+	mesurementInterval := time.Duration(config.MeasurementInterval) * time.Millisecond
+	ticker := time.NewTicker(mesurementInterval)
 	defer ticker.Stop()
 
 	for {
@@ -88,11 +103,11 @@ func setFans(
 	controller victus.Controller,
 	temperature float64,
 ) error {
-	if temperature >= 77 {
+	if temperature >= activateTemperature {
 		return controller.SetFansMax(ctx)
 	}
 
-	if temperature < 68 {
+	if temperature < deactivateTemperature {
 		return controller.SetFansAuto(ctx)
 	}
 
