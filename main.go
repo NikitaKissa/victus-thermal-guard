@@ -52,13 +52,17 @@ func run() error {
 	)
 	defer stop()
 
-	config, err := config.NewConfig("./deploy/default-config.cfg")
+	programConfig, err := config.NewConfig("./deploy/default-config.cfg")
 	if err != nil {
 		log.Print(err)
 	}
 
-	activateTemperature = config.ActivateTemperature
-	deactivateTemperature = config.ActivateTemperature - config.Hysteresis
+	strConfig := config.StringifyConfig(programConfig)
+	strConfig = fmt.Sprintf("Thermal-Guard runs with config: %s", strConfig)
+	log.Print(strConfig)
+
+	activateTemperature = programConfig.ActivateTemperature
+	deactivateTemperature = programConfig.ActivateTemperature - programConfig.Hysteresis
 
 	if err := temperatures.FindTelemetry(); err != nil {
 		return fmt.Errorf("find telemetry: %w", err)
@@ -72,7 +76,7 @@ func run() error {
 
 	controller := victus.NewController(backend)
 
-	mesurementInterval := time.Duration(config.MeasurementInterval) * time.Millisecond
+	mesurementInterval := time.Duration(programConfig.MeasurementInterval) * time.Millisecond
 	ticker := time.NewTicker(mesurementInterval)
 	defer ticker.Stop()
 

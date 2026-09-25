@@ -38,6 +38,15 @@ func NewConfig(path string) (Config, error) {
 		}, fmt.Errorf("unable to parse config file: %w", err)
 	}
 
-	config := configMapToConfig(configMap)
-	return config, nil
+	config, err := configMapToConfig(configMap)
+	return config, err
+}
+
+func StringifyConfig(cfg Config) string {
+	return fmt.Sprintf(
+		"ActivateTemperature=%v; Hysteresis=%v; MeasurementInterval=%v",
+		cfg.ActivateTemperature,
+		cfg.Hysteresis,
+		cfg.MeasurementInterval,
+	)
 }
