@@ -17,6 +17,8 @@ import (
 	victusdbus "github.com/NikitaKissa/victus-thermal-guard/victus/dbus"
 )
 
+var ConfigPath = "./deploy/default-config.cfg"
+
 func main() {
 	runtime.GOMAXPROCS(2)
 
@@ -52,7 +54,7 @@ func run() error {
 	)
 	defer stop()
 
-	programConfig, err := config.NewConfig("./deploy/default-config.cfg")
+	programConfig, err := config.NewConfig(ConfigPath)
 	if err != nil {
 		log.Print(err)
 	}
