@@ -13,12 +13,6 @@ type Config struct {
 	MeasurementInterval int
 }
 
-const (
-	defaultActivateTemperature float64 = 80
-	defaultHysteresis          float64 = 10
-	defaultMeasurementInterval int     = 250
-)
-
 func defaultConfig() Config {
 	return Config{
 		ActivateTemperature: 80,
@@ -30,20 +24,12 @@ func defaultConfig() Config {
 func NewConfig(path string) (Config, error) {
 	buf, err := os.ReadFile(path)
 	if err != nil {
-		return Config{
-			ActivateTemperature: defaultActivateTemperature,
-			Hysteresis:          defaultHysteresis,
-			MeasurementInterval: defaultMeasurementInterval,
-		}, fmt.Errorf("unable to open config file: %w", err)
+		return defaultConfig(), fmt.Errorf("unable to open config file: %w", err)
 	}
 
 	configMap, err := configparser.Parse(buf)
 	if err != nil {
-		return Config{
-			ActivateTemperature: defaultActivateTemperature,
-			Hysteresis:          defaultHysteresis,
-			MeasurementInterval: defaultMeasurementInterval,
-		}, fmt.Errorf("unable to parse config file: %w", err)
+		return defaultConfig(), fmt.Errorf("unable to parse config file: %w", err)
 	}
 
 	config, err := configMapToConfig(configMap)

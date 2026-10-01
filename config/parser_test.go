@@ -7,6 +7,8 @@ import (
 )
 
 func TestConfigMapToConfig(t *testing.T) {
+	defaultCfg := defaultConfig()
+
 	tests := []struct {
 		name    string
 		input   configparser.ConfigMap
@@ -16,14 +18,14 @@ func TestConfigMapToConfig(t *testing.T) {
 		{
 			name: "valid data",
 			input: configparser.ConfigMap{
-				"ActivateTemperature": "80",
-				"Hysteresis":          "10",
-				"MeasurementInterval": "250",
+				"ActivateTemperature": "83",
+				"Hysteresis":          "15",
+				"MeasurementInterval": "200",
 			},
 			want: Config{
-				ActivateTemperature: 80,
-				Hysteresis:          10,
-				MeasurementInterval: 250,
+				ActivateTemperature: 83,
+				Hysteresis:          15,
+				MeasurementInterval: 200,
 			},
 		},
 		{
@@ -33,10 +35,45 @@ func TestConfigMapToConfig(t *testing.T) {
 				"Hysteresis":          "",
 				"MeasurementInterval": "",
 			},
+			want: defaultCfg,
+		},
+		{
+			name: "empty `ActivateTemperature`",
+			input: configparser.ConfigMap{
+				"ActivateTemperature": "",
+				"Hysteresis":          "15",
+				"MeasurementInterval": "200",
+			},
 			want: Config{
-				ActivateTemperature: defaultActivateTemperature,
-				Hysteresis:          defaultHysteresis,
-				MeasurementInterval: defaultMeasurementInterval,
+				ActivateTemperature: defaultCfg.ActivateTemperature,
+				Hysteresis:          15,
+				MeasurementInterval: 200,
+			},
+		},
+		{
+			name: "empty `Hysteresis`",
+			input: configparser.ConfigMap{
+				"ActivateTemperature": "83",
+				"Hysteresis":          "",
+				"MeasurementInterval": "200",
+			},
+			want: Config{
+				ActivateTemperature: 83,
+				Hysteresis:          defaultCfg.Hysteresis,
+				MeasurementInterval: 200,
+			},
+		},
+		{
+			name: "empty `MeasurementInterval`",
+			input: configparser.ConfigMap{
+				"ActivateTemperature": "83",
+				"Hysteresis":          "15",
+				"MeasurementInterval": "",
+			},
+			want: Config{
+				ActivateTemperature: 83,
+				Hysteresis:          15,
+				MeasurementInterval: defaultCfg.MeasurementInterval,
 			},
 		},
 		{
@@ -46,12 +83,14 @@ func TestConfigMapToConfig(t *testing.T) {
 				"Hysteresis":          "10C",
 				"MeasurementInterval": "250ms",
 			},
-			want: Config{
-				ActivateTemperature: defaultActivateTemperature,
-				Hysteresis:          defaultHysteresis,
-				MeasurementInterval: defaultMeasurementInterval,
-			},
+			want:    defaultCfg,
 			wantErr: true,
+		},
+		{
+			name:    "empty config map",
+			input:   configparser.ConfigMap{},
+			want:    defaultCfg,
+			wantErr: false,
 		},
 	}
 
