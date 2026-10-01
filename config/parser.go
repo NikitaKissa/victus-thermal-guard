@@ -13,58 +13,46 @@ var (
 )
 
 func configMapToConfig(cfgMap configparser.ConfigMap) (Config, error) {
-	var cfg Config
+	cfg := defaultConfig()
 	errs := make([]error, 0, 3)
 
 	// Activate Temperature
-	activateTemperature := cfgMap["ActivateTemperature"]
-	if activateTemperature == "" {
-		cfg.ActivateTemperature = defaultActivateTemperature
-	} else {
-		activateTemperatureVal, err := stringToFloat(activateTemperature)
-		if err != nil {
-			cfg.ActivateTemperature = defaultActivateTemperature
-			errs = append(
-				errs,
-				fmt.Errorf("parsing to float `ActivateTemperature`: %w", err),
-			)
-		} else {
-			cfg.ActivateTemperature = activateTemperatureVal
-		}
+	activateTemperature, err := getFloatFromMap(cfgMap, "ActivateTemperature")
+	if err != nil {
+		errs = append(
+			errs,
+			fmt.Errorf("parsing to float `ActivateTemperature`: %w", err),
+		)
+	}
+
+	if activateTemperature != nil {
+		cfg.ActivateTemperature = *activateTemperature
 	}
 
 	// Hysteresis
-	hysteresis := cfgMap["Hysteresis"]
-	if hysteresis == "" {
-		cfg.Hysteresis = defaultHysteresis
-	} else {
-		hysteresisVal, err := stringToFloat(hysteresis)
-		if err != nil {
-			cfg.Hysteresis = defaultHysteresis
-			errs = append(
-				errs,
-				fmt.Errorf("parsing to float `Hysteresis`: %w", err),
-			)
-		} else {
-			cfg.Hysteresis = hysteresisVal
-		}
+	hysteresis, err := getFloatFromMap(cfgMap, "Hysteresis")
+	if err != nil {
+		errs = append(
+			errs,
+			fmt.Errorf("parsing to float `Hysteresis`: %w", err),
+		)
+	}
+
+	if hysteresis != nil {
+		cfg.Hysteresis = *hysteresis
 	}
 
 	// Measurement Interval
-	measurementInterval := cfgMap["MeasurementInterval"]
-	if activateTemperature == "" {
-		cfg.MeasurementInterval = defaultMeasurementInterval
-	} else {
-		measurementIntervalVal, err := stringToInt(measurementInterval)
-		if err != nil {
-			cfg.MeasurementInterval = defaultMeasurementInterval
-			errs = append(
-				errs,
-				fmt.Errorf("parsing to int `MeasurementInterval`: %w", err),
-			)
-		} else {
-			cfg.MeasurementInterval = measurementIntervalVal
-		}
+	measurementInterval, err := getIntFromMap(cfgMap, "MeasurementInterval")
+	if err != nil {
+		errs = append(
+			errs,
+			fmt.Errorf("parsing to int `MeasurementInterval`: %w", err),
+		)
+	}
+
+	if measurementInterval != nil {
+		cfg.MeasurementInterval = *measurementInterval
 	}
 
 	// errors processing
@@ -73,7 +61,7 @@ func configMapToConfig(cfgMap configparser.ConfigMap) (Config, error) {
 		return cfg, nil
 	}
 
-	err := fmt.Errorf("%w\n", ErrSyntax)
+	err = fmt.Errorf("%w\n", ErrSyntax)
 	for _, val := range errs {
 		err = fmt.Errorf(
 			"%w\n%v",
@@ -90,7 +78,35 @@ func stringToFloat(s string) (float64, error) {
 	return f, err
 }
 
+func getFloatFromMap(cfgMap configparser.ConfigMap, key string) (*float64, error) {
+	strValue := cfgMap[key]
+	if strValue == "" {
+		return nil, nil
+	}
+
+	value, err := stringToFloat(strValue)
+	if err != nil {
+		return nil, err
+	}
+
+	return &value, nil
+}
+
 func stringToInt(s string) (int, error) {
 	i, err := strconv.Atoi(s)
 	return i, err
+}
+
+func getIntFromMap(cfgMap configparser.ConfigMap, key string) (*int, error) {
+	strValue := cfgMap[key]
+	if strValue == "" {
+		return nil, nil
+	}
+
+	value, err := stringToInt(strValue)
+	if err != nil {
+		return nil, err
+	}
+
+	return &value, nil
 }

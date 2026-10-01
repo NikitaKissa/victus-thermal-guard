@@ -19,6 +19,14 @@ const (
 	defaultMeasurementInterval int     = 250
 )
 
+func defaultConfig() Config {
+	return Config{
+		ActivateTemperature: 80,
+		Hysteresis:          10,
+		MeasurementInterval: 250,
+	}
+}
+
 func NewConfig(path string) (Config, error) {
 	buf, err := os.ReadFile(path)
 	if err != nil {
