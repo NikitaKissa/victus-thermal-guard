@@ -33,6 +33,8 @@ func NewConfig(path string) (Config, error) {
 	}
 
 	config, err := configMapToConfig(configMap)
+	err = validateConfig(&config)
+
 	return config, err
 }
 

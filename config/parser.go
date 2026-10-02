@@ -1,15 +1,10 @@
 package config
 
 import (
-	"errors"
 	"fmt"
 	"strconv"
 
 	configparser "github.com/NikitaKissa/victus-thermal-guard/config/parser"
-)
-
-var (
-	ErrSyntax = errors.New("syntax error during parsing config")
 )
 
 func configMapToConfig(cfgMap configparser.ConfigMap) (Config, error) {
