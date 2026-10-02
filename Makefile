@@ -26,7 +26,12 @@ install:
 	@test -f $(BUILD_DIR)/$(BINARY) || { echo "binary not found: run 'make' first, then 'sudo make install'"; exit 1; }
 	install -Dm755 $(BUILD_DIR)/$(BINARY) $(BINDIR)/$(BINARY)
 	install -Dm644 deploy/$(SERVICE) $(UNIT_DIR)/$(SERVICE)
-	install -Dm644 deploy/$(CONFIG) $(CONFIG_PATH)
+	@if [ ! -f $(CONFIG_PATH) ]; then \
+		install -Dm644 deploy/$(CONFIG) $(CONFIG_PATH); \
+		echo "installed default config to $(CONFIG_PATH)"; \
+	else \
+		echo "config already exists at $(CONFIG_PATH), not overwriting"; \
+	fi
 	systemctl daemon-reload
 	systemctl enable $(SERVICE)
 	systemctl restart $(SERVICE)

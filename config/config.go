@@ -25,6 +25,10 @@ func defaultConfig() Config {
 func Load(path string) (Config, error) {
 	buf, err := os.ReadFile(path)
 	if err != nil {
+		if os.IsNotExist(err) {
+			return defaultConfig(), fmt.Errorf("config file not found: %w", err)
+		}
+
 		return defaultConfig(), fmt.Errorf("unable to open config file: %w", err)
 	}
 
