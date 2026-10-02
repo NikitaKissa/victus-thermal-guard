@@ -3,6 +3,7 @@ package config
 import (
 	"fmt"
 	"strconv"
+	"time"
 
 	"github.com/NikitaKissa/victus-thermal-guard/config/parser"
 	"github.com/NikitaKissa/victus-thermal-guard/types"
@@ -42,7 +43,7 @@ func configMapToConfig(cfgMap parser.ConfigMap) (Config, error) {
 	}
 
 	if measurementInterval != nil {
-		cfg.MeasurementInterval = *measurementInterval
+		cfg.MeasurementInterval = time.Duration(*measurementInterval) * time.Millisecond
 	}
 
 	return cfg, errs.ToError(ErrSyntax)

@@ -3,6 +3,7 @@ package config
 import (
 	"fmt"
 	"os"
+	"time"
 
 	"github.com/NikitaKissa/victus-thermal-guard/config/parser"
 )
@@ -10,14 +11,14 @@ import (
 type Config struct {
 	ActivateTemperature float64
 	Hysteresis          float64
-	MeasurementInterval int
+	MeasurementInterval time.Duration
 }
 
 func defaultConfig() Config {
 	return Config{
 		ActivateTemperature: 80,
 		Hysteresis:          10,
-		MeasurementInterval: 250,
+		MeasurementInterval: 250 * time.Millisecond,
 	}
 }
 

@@ -78,7 +78,7 @@ func run() error {
 
 	controller := victus.NewController(backend)
 
-	mesurementInterval := time.Duration(programConfig.MeasurementInterval) * time.Millisecond
+	mesurementInterval := programConfig.MeasurementInterval
 	ticker := time.NewTicker(mesurementInterval)
 	defer ticker.Stop()
 
