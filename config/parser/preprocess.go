@@ -14,7 +14,7 @@ func cleanRow(s string) string {
 			break
 		}
 
-		if unicode.IsLetter(r) || unicode.IsNumber(r) || r == '=' {
+		if unicode.IsLetter(r) || unicode.IsNumber(r) || r == '=' || r == '-' {
 
 			b.WriteRune(r)
 		}
