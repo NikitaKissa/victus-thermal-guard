@@ -4,10 +4,10 @@ import (
 	"fmt"
 	"strconv"
 
-	configparser "github.com/NikitaKissa/victus-thermal-guard/config/parser"
+	"github.com/NikitaKissa/victus-thermal-guard/config/parser"
 )
 
-func configMapToConfig(cfgMap configparser.ConfigMap) (Config, error) {
+func configMapToConfig(cfgMap parser.ConfigMap) (Config, error) {
 	cfg := defaultConfig()
 	errs := make([]error, 0, 3)
 
@@ -73,7 +73,7 @@ func stringToFloat(s string) (float64, error) {
 	return f, err
 }
 
-func getFloatFromMap(cfgMap configparser.ConfigMap, key string) (*float64, error) {
+func getFloatFromMap(cfgMap parser.ConfigMap, key string) (*float64, error) {
 	strValue := cfgMap[key]
 	if strValue == "" {
 		return nil, nil
@@ -92,7 +92,7 @@ func stringToInt(s string) (int, error) {
 	return i, err
 }
 
-func getIntFromMap(cfgMap configparser.ConfigMap, key string) (*int, error) {
+func getIntFromMap(cfgMap parser.ConfigMap, key string) (*int, error) {
 	strValue := cfgMap[key]
 	if strValue == "" {
 		return nil, nil

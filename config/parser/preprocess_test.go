@@ -1,4 +1,4 @@
-package configparser
+package parser
 
 import (
 	"testing"
@@ -39,6 +39,11 @@ func TestCleanRow(t *testing.T) {
 			name:  "with newline",
 			input: "ActivateTemperature=79\n",
 			want:  "ActivateTemperature=79",
+		},
+		{
+			name:  "float value",
+			input: "ActivateTemperature=79.54\n",
+			want:  "ActivateTemperature=79.54",
 		},
 		{
 			name:  "with 3 newlines",

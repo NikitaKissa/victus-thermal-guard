@@ -3,7 +3,7 @@ package config
 import (
 	"testing"
 
-	configparser "github.com/NikitaKissa/victus-thermal-guard/config/parser"
+	"github.com/NikitaKissa/victus-thermal-guard/config/parser"
 )
 
 func TestConfigMapToConfig(t *testing.T) {
@@ -11,13 +11,13 @@ func TestConfigMapToConfig(t *testing.T) {
 
 	tests := []struct {
 		name    string
-		input   configparser.ConfigMap
+		input   parser.ConfigMap
 		want    Config
 		wantErr bool
 	}{
 		{
 			name: "valid data",
-			input: configparser.ConfigMap{
+			input: parser.ConfigMap{
 				"ActivateTemperature": "83",
 				"Hysteresis":          "15",
 				"MeasurementInterval": "200",
@@ -30,7 +30,7 @@ func TestConfigMapToConfig(t *testing.T) {
 		},
 		{
 			name: "all empty fields",
-			input: configparser.ConfigMap{
+			input: parser.ConfigMap{
 				"ActivateTemperature": "",
 				"Hysteresis":          "",
 				"MeasurementInterval": "",
@@ -39,7 +39,7 @@ func TestConfigMapToConfig(t *testing.T) {
 		},
 		{
 			name: "empty `ActivateTemperature`",
-			input: configparser.ConfigMap{
+			input: parser.ConfigMap{
 				"ActivateTemperature": "",
 				"Hysteresis":          "15",
 				"MeasurementInterval": "200",
@@ -52,7 +52,7 @@ func TestConfigMapToConfig(t *testing.T) {
 		},
 		{
 			name: "empty `Hysteresis`",
-			input: configparser.ConfigMap{
+			input: parser.ConfigMap{
 				"ActivateTemperature": "83",
 				"Hysteresis":          "",
 				"MeasurementInterval": "200",
@@ -65,7 +65,7 @@ func TestConfigMapToConfig(t *testing.T) {
 		},
 		{
 			name: "empty `MeasurementInterval`",
-			input: configparser.ConfigMap{
+			input: parser.ConfigMap{
 				"ActivateTemperature": "83",
 				"Hysteresis":          "15",
 				"MeasurementInterval": "",
@@ -78,7 +78,7 @@ func TestConfigMapToConfig(t *testing.T) {
 		},
 		{
 			name: "invalid data",
-			input: configparser.ConfigMap{
+			input: parser.ConfigMap{
 				"ActivateTemperature": "80C",
 				"Hysteresis":          "10C",
 				"MeasurementInterval": "250ms",
@@ -88,7 +88,7 @@ func TestConfigMapToConfig(t *testing.T) {
 		},
 		{
 			name:    "empty config map",
-			input:   configparser.ConfigMap{},
+			input:   parser.ConfigMap{},
 			want:    defaultCfg,
 			wantErr: false,
 		},

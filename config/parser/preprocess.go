@@ -1,10 +1,14 @@
-package configparser
+package parser
 
 import (
 	"fmt"
 	"strings"
 	"unicode"
 )
+
+func isAllowedRune(r rune) bool {
+	return unicode.IsLetter(r) || unicode.IsNumber(r) || r == '=' || r == '-' || r == '.'
+}
 
 func cleanRow(s string) string {
 	var b strings.Builder
@@ -14,8 +18,7 @@ func cleanRow(s string) string {
 			break
 		}
 
-		if unicode.IsLetter(r) || unicode.IsNumber(r) || r == '=' || r == '-' {
-
+		if isAllowedRune(r) {
 			b.WriteRune(r)
 		}
 	}

@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"os"
 
-	configparser "github.com/NikitaKissa/victus-thermal-guard/config/parser"
+	"github.com/NikitaKissa/victus-thermal-guard/config/parser"
 )
 
 type Config struct {
@@ -27,15 +27,21 @@ func NewConfig(path string) (Config, error) {
 		return defaultConfig(), fmt.Errorf("unable to open config file: %w", err)
 	}
 
-	configMap, err := configparser.Parse(buf)
+	configMap, err := parser.Parse(buf)
 	if err != nil {
 		return defaultConfig(), fmt.Errorf("unable to parse config file: %w", err)
 	}
 
 	config, err := configMapToConfig(configMap)
-	err = validateConfig(&config)
+	if err != nil {
+		return config, err
+	}
 
-	return config, err
+	if err := validateConfig(&config); err != nil {
+		return config, err
+	}
+
+	return config, nil
 }
 
 func StringifyConfig(cfg Config) string {

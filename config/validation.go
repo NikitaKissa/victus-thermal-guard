@@ -4,6 +4,10 @@ import (
 	"fmt"
 )
 
+const (
+	MeasurementIntervalMin = 50
+)
+
 func validateConfig(cfg *Config) error {
 	if cfg == nil {
 		panic("config during validation cant be <nil> pointer")
@@ -40,9 +44,9 @@ func validateConfig(cfg *Config) error {
 	}
 
 	// MeasurementInterval
-	if cfg.MeasurementInterval <= 0 {
+	if cfg.MeasurementInterval < MeasurementIntervalMin {
 		cfg.MeasurementInterval = defaultCfg.MeasurementInterval
-		return fmt.Errorf("`MeasurementInterval` can't be less or equal 0ms: %w", ErrValidation)
+		return fmt.Errorf("`MeasurementInterval` can't be less than %dms: %w", MeasurementIntervalMin, ErrValidation)
 	}
 
 	return nil
