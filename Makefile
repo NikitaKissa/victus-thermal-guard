@@ -2,12 +2,12 @@ MODULE_NAME := github.com/NikitaKissa/victus-thermal-guard
 
 BINARY    := thermal-guard
 SERVICE   := thermal-guard.service
-CONFIG    := default-config.cfg
+CONFIG    := default-config.conf
 BUILD_DIR := build
 BINDIR    := /usr/local/bin
 UNIT_DIR  := /etc/systemd/system
 
-CONFIG_PATH := /etc/thermal-guard.cfg
+CONFIG_PATH := /etc/thermal-guard.conf
 
 .PHONY: build test install uninstall
 

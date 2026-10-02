@@ -37,7 +37,7 @@ func NewConfig(path string) (Config, error) {
 		return config, err
 	}
 
-	if err := validateConfig(&config); err != nil {
+	if err := validateAndRepairConfig(&config); err != nil {
 		return config, err
 	}
 

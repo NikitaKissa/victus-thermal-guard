@@ -17,7 +17,7 @@ import (
 	victusdbus "github.com/NikitaKissa/victus-thermal-guard/victus/dbus"
 )
 
-var ConfigPath = "./deploy/default-config.cfg"
+var ConfigPath = "./deploy/default-config.conf"
 
 func main() {
 	runtime.GOMAXPROCS(2)

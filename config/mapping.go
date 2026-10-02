@@ -5,19 +5,18 @@ import (
 	"strconv"
 
 	"github.com/NikitaKissa/victus-thermal-guard/config/parser"
+	"github.com/NikitaKissa/victus-thermal-guard/types"
 )
 
 func configMapToConfig(cfgMap parser.ConfigMap) (Config, error) {
 	cfg := defaultConfig()
-	errs := make([]error, 0, 3)
+	errs := make(types.Errors, 0, 3)
 
 	// Activate Temperature
 	activateTemperature, err := getFloatFromMap(cfgMap, "ActivateTemperature")
 	if err != nil {
-		errs = append(
-			errs,
-			fmt.Errorf("parsing to float `ActivateTemperature`: %w", err),
-		)
+		err = fmt.Errorf("parsing to float `ActivateTemperature`: %w", err)
+		errs.Add(err)
 	}
 
 	if activateTemperature != nil {
@@ -27,10 +26,8 @@ func configMapToConfig(cfgMap parser.ConfigMap) (Config, error) {
 	// Hysteresis
 	hysteresis, err := getFloatFromMap(cfgMap, "Hysteresis")
 	if err != nil {
-		errs = append(
-			errs,
-			fmt.Errorf("parsing to float `Hysteresis`: %w", err),
-		)
+		err = fmt.Errorf("parsing to float `Hysteresis`: %w", err)
+		errs.Add(err)
 	}
 
 	if hysteresis != nil {
@@ -40,32 +37,15 @@ func configMapToConfig(cfgMap parser.ConfigMap) (Config, error) {
 	// Measurement Interval
 	measurementInterval, err := getIntFromMap(cfgMap, "MeasurementInterval")
 	if err != nil {
-		errs = append(
-			errs,
-			fmt.Errorf("parsing to int `MeasurementInterval`: %w", err),
-		)
+		err = fmt.Errorf("parsing to int `MeasurementInterval`: %w", err)
+		errs.Add(err)
 	}
 
 	if measurementInterval != nil {
 		cfg.MeasurementInterval = *measurementInterval
 	}
 
-	// errors processing
-
-	if len(errs) == 0 {
-		return cfg, nil
-	}
-
-	err = fmt.Errorf("%w\n", ErrSyntax)
-	for _, val := range errs {
-		err = fmt.Errorf(
-			"%w\n%v",
-			err,
-			val,
-		)
-	}
-
-	return cfg, err
+	return cfg, errs.ToError(ErrSyntax)
 }
 
 func stringToFloat(s string) (float64, error) {
