@@ -22,7 +22,7 @@ func defaultConfig() Config {
 	}
 }
 
-func NewConfig(path string) (Config, error) {
+func Load(path string) (Config, error) {
 	buf, err := os.ReadFile(path)
 	if err != nil {
 		return defaultConfig(), fmt.Errorf("unable to open config file: %w", err)

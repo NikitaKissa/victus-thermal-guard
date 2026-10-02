@@ -54,7 +54,7 @@ func run() error {
 	)
 	defer stop()
 
-	programConfig, err := config.NewConfig(ConfigPath)
+	programConfig, err := config.Load(ConfigPath)
 	if err != nil {
 		log.Print(err)
 	}
